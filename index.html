@@ -141,10 +141,32 @@
     .hero {
       padding: 80px 72px 72px;
       border-bottom: 1px solid var(--color-rule);
+      display: flex;
+      align-items: flex-start;
+      gap: 64px;
     }
 
-    @media (max-width: 760px) {
-      .hero { padding: 48px 28px 40px; }
+    .hero-content {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .hero-photo {
+      flex: 0 0 280px;
+      width: 280px;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      object-position: center top;
+      border-radius: 15px;
+      border: 1px solid var(--color-glass-border);
+      box-shadow: 0 4px 24px rgba(15, 10, 2, 0.12);
+      display: block;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 860px) {
+      .hero { flex-direction: column-reverse; gap: 32px; padding: 48px 28px 40px; }
+      .hero-photo { flex: none; width: 140px; aspect-ratio: 1 / 1; }
     }
 
     .hero-eyebrow {
@@ -247,34 +269,60 @@
     }
 
     /* ============================================================
-       ELEGANT LIST (Pourquoi…)
+       POURQUOI — 3 blocs thématiques
     ============================================================ */
-    .elegant-list {
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+    }
+
+    @media (max-width: 780px) {
+      .why-grid { grid-template-columns: 1fr; gap: 28px; }
+    }
+
+    .why-block {
+      border-top: 2px solid var(--color-rule-strong);
+      padding-top: 22px;
+    }
+
+    .why-keyword {
+      font-family: var(--font-serif);
+      font-size: 1.30rem;
+      font-style: italic;
+      color: var(--color-accent);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .why-block p {
+      font-size: 0.88rem;
+      color: var(--color-text-mid);
+      line-height: 1.68;
+      margin-bottom: 12px;
+    }
+
+    .why-list {
       list-style: none;
       padding: 0;
-      columns: 2;
-      column-gap: 48px;
+      margin: 0;
     }
 
-    @media (max-width: 680px) {
-      .elegant-list { columns: 1; }
-    }
-
-    .elegant-list li {
-      font-size: 0.95rem;
-      color: var(--color-text-mid);
-      padding: 8px 0 8px 20px;
+    .why-list li {
+      font-size: 0.83rem;
+      color: var(--color-text-light);
+      padding: 5px 0 5px 14px;
       border-bottom: 1px solid var(--color-rule);
       position: relative;
-      break-inside: avoid;
     }
 
-    .elegant-list li::before {
-      content: '—';
+    .why-list li::before {
+      content: '·';
       position: absolute;
       left: 0;
-      color: var(--color-text-light);
-      font-size: 0.8rem;
+      color: var(--color-accent);
+      font-size: 1rem;
+      line-height: 1.4;
     }
 
     /* ============================================================
@@ -311,59 +359,71 @@
     }
 
     /* ============================================================
-       CONTACT SECTION
+       CONTACT
     ============================================================ */
     .section-contact {
       background: var(--color-contact-bg);
-      padding: 56px 72px;
       border-bottom: none;
     }
 
-    @media (max-width: 760px) {
-      .section-contact { padding: 40px 28px; }
+    .contact-intro {
+      font-family: var(--font-serif);
+      font-size: clamp(1rem, 1.6vw, 1.18rem);
+      color: var(--color-text-dark);
+      font-style: bold;
+      max-width: 620px;
+      line-height: 1.65;
+      margin-bottom: 12px;
+    }
+
+    .contact-note {
+      font-size: 0.88rem;
+      color: var(--color-text-light);
+      margin-bottom: 36px;
+      font-style: normal;
     }
 
     .contact-body {
       display: flex;
-      align-items: flex-start;
+      align-items: flex-end;
       gap: 64px;
       flex-wrap: wrap;
     }
 
-    .contact-text {
-      flex: 1 1 260px;
-    }
+    .contact-left { flex: 1 1 300px; }
 
     .contact-info {
       flex: 0 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 14px;
+      padding: 28px 32px;
+      border: 1px solid var(--color-rule);
+      background: rgba(251, 249, 244, 0.60);
     }
 
     .contact-item {
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       color: var(--color-text-mid);
     }
 
-    .contact-item strong {
-      color: var(--color-text-dark);
-      font-weight: 600;
-      margin-right: 6px;
+    .contact-item .label {
+      display: block;
+      font-size: 0.64rem;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--color-text-light);
+      margin-bottom: 2px;
     }
 
     .contact-item a {
       color: var(--color-accent);
       text-decoration: none;
+      font-family: var(--font-serif);
+      font-size: 0.96rem;
     }
 
-    .contact-item a:hover {
-      text-decoration: underline;
-    }
-
-    .contact-cta {
-      margin-top: 22px;
-    }
+    .contact-item a:hover { text-decoration: underline; }
 
     /* ============================================================
        FOOTER
@@ -425,14 +485,21 @@
          HERO
     ====================================================== -->
     <header class="hero">
-      <p class="hero-eyebrow">Antoine Zak — Historien de l'art</p>
-      <h1>Recherche de provenance<br>et identification d'objets&nbsp;d'art</h1>
-      <p class="hero-subtitle">
-        Accompagnement des particuliers et des professionnels dans
-        l'identification, l'étude et la reconstitution de l'historique
-        des œuvres et objets d'art.
-      </p>
-      <a href="#contact" class="btn" aria-label="Accéder au formulaire de contact">Demander une étude</a>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Antoine Zak — Historien de l'art</p>
+        <h1>Recherche de provenance<br>et identification d'objets&nbsp;d'art</h1>
+        <p class="hero-subtitle">
+          Accompagnement des particuliers et des professionnels dans
+          l'identification, l'étude et la reconstitution de l'historique
+          des œuvres et objets d'art.
+        </p>
+        <a href="#contact" class="btn" aria-label="Accéder au formulaire de contact">Demander une étude</a>
+      </div>
+      <img
+        src="photo_profil.JPG"
+        alt="Antoine Zak, historien de l'art"
+        class="hero-photo"
+      />
     </header>
 
     <!-- ======================================================
@@ -498,19 +565,43 @@
     </section>
 
     <!-- ======================================================
-         POURQUOI CONNAÎTRE L'HISTORIQUE
+         POURQUOI — 3 blocs thématiques
     ====================================================== -->
     <section class="section" id="pourquoi" aria-labelledby="titre-pourquoi">
-      <h2 id="titre-pourquoi">Pourquoi connaître l'historique d'un objet&nbsp;?</h2>
-      <ul class="elegant-list" role="list">
-        <li>Mieux comprendre son origine.</li>
-        <li>Reconstituer son parcours historique.</li>
-        <li>Identifier les propriétaires successifs.</li>
-        <li>Documenter une collection.</li>
-        <li>Préparer une expertise.</li>
-        <li>Renforcer la crédibilité d'une vente.</li>
-        <li>Déterminer ou valoriser sa valeur patrimoniale et financière.</li>
-      </ul>
+      <h2 class="section-title" id="titre-pourquoi">Pourquoi connaître l'historique d'un objet&nbsp;?</h2>
+      <div class="why-grid">
+
+        <div class="why-block">
+          <span class="why-keyword">Valoriser</span>
+          <p>La connaissance de la provenance renforce la valeur patrimoniale et financière d'un objet, facilite son expertise et crédibilise toute transaction.</p>
+          <ul class="why-list">
+            <li>Renforcer la crédibilité d'une vente</li>
+            <li>Préparer une expertise</li>
+            <li>Valoriser une collection</li>
+          </ul>
+        </div>
+
+        <div class="why-block">
+          <span class="why-keyword">Comprendre</span>
+          <p>Retracer le parcours d'un objet permet d'en saisir la signification historique, d'identifier ses propriétaires et de reconstituer son contexte d'origine.</p>
+          <ul class="why-list">
+            <li>Mieux comprendre son origine</li>
+            <li>Reconstituer son parcours historique</li>
+            <li>Identifier les propriétaires successifs</li>
+          </ul>
+        </div>
+
+        <div class="why-block">
+          <span class="why-keyword">Transmettre</span>
+          <p>Documenter un objet, c'est aussi le préparer à être transmis, légué ou conservé, en constituant une mémoire fiable pour les générations suivantes.</p>
+          <ul class="why-list">
+            <li>Documenter une collection</li>
+            <li>Constituer une mémoire patrimoniale</li>
+            <li>Faciliter une succession ou un legs</li>
+          </ul>
+        </div>
+
+      </div>
     </section>
 
     <!-- ======================================================
@@ -549,34 +640,36 @@
          CONTACT
     ====================================================== -->
     <section class="section section-contact" id="contact" aria-labelledby="titre-contact">
-      <h2 id="titre-contact">Contact</h2>
+      <h2 class="section-title" id="titre-contact">Contact</h2>
       <div class="contact-body">
 
-        <div class="contact-text">
-          <p>
-            Vous souhaitez obtenir des informations ou faire étudier un objet&nbsp;?
-            N'hésitez pas à prendre contact.
+        <div class="contact-left">
+          <p class="contact-intro">
+            Vous souhaitez connaître l'origine d'un objet, documenter une collection
+            ou reconstituer une provenance&nbsp;?
           </p>
-          <div class="contact-cta">
-            <a href="mailto:zak.antoine@wanadoo.fr" class="btn btn-solid">
-              Contacter par e-mail
-            </a>
-          </div>
+          <p class="contact-note">
+            Un premier échange permet d'évaluer les pistes de recherche envisageables.
+          </p>
+          <a href="mailto:zak.antoine@wanadoo.fr" class="btn btn-solid">
+            Contacter par e-mail
+          </a>
         </div>
 
         <address class="contact-info" style="font-style: normal;">
-          <p class="contact-item">
-            <strong>Téléphone</strong>
+          <div class="contact-item">
+            <span class="label">Téléphone</span>
             <a href="tel:0671119821">06 71 11 98 21</a>
-          </p>
-          <p class="contact-item">
-            <strong>Mail</strong>
+          </div>
+          <div class="contact-item">
+            <span class="label">Adresse électronique</span>
             <a href="mailto:zak.antoine@wanadoo.fr">zak.antoine@wanadoo.fr</a>
-          </p>
+          </div>
         </address>
 
       </div>
     </section>
+
 
     <!-- ======================================================
          FOOTER
@@ -586,7 +679,7 @@
         &copy; Recherche de provenance et identification d'objets d'art
       </span>
       <span class="footer-attribution">
-        Image&nbsp;: <a href="https://www.magnific.com" target="_blank" rel="noopener noreferrer">designed by wirestock — Magnific.com</a>
+        Image de fond&nbsp;: <a href="https://www.magnific.com" target="_blank" rel="noopener noreferrer">designed by wirestock — Magnific.com</a>
       </span>
     </footer>
 
