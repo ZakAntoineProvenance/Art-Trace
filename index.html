@@ -1,1 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recherche de provenance et identification d'objets d'art — Antoine Zak</title>
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
+    :root {
+      --color-bg-overlay:   rgba(20, 18, 15, 0.45);
+      --color-glass-bg:     rgba(252, 250, 246, 0.82);
+      --color-glass-border: rgba(180, 170, 155, 0.30);
+      --color-text-dark:    #2a2520;
+      --color-text-mid:     #4a4540;
+      --color-text-light:   #7a746e;
+      --color-accent:       #5c4f3a;
+      --color-accent-hover: #3e3428;
+      --color-rule:         rgba(100, 90, 75, 0.20);
+      --color-contact-bg:   rgba(245, 242, 236, 0.92);
+      --font-serif:         Georgia, "Garamond", "Times New Roman", serif;
+      --font-sans:          "Segoe UI", system-ui, -apple-system, sans-serif;
+      --radius:             2px;
+      --shadow:             0 4px 32px rgba(20, 15, 5, 0.12), 0 1px 4px rgba(20,15,5,0.06);
+      --transition:         0.22s ease;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--color-text-dark);
+      min-height: 100vh;
+
+      /* Background image — fixed, centred, covering */
+      background-image: url('rooftop-old-roman-temple-with-statues-top.jpg');
+      background-attachment: fixed;
+      background-position: center center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    /* Dark overlay on top of the background image */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: var(--color-bg-overlay);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       LAYOUT WRAPPER
+    ============================================================ */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      padding: 60px 20px 0;
+    }
+
+    /* Central glazed container */
+    .container {
+      width: 80%;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--color-glass-bg);
+      border: 1px solid var(--color-glass-border);
+      border-radius: 3px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px) saturate(1.1);
+      -webkit-backdrop-filter: blur(14px) saturate(1.1);
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       TYPOGRAPHY
+    ============================================================ */
+    h1, h2, h3 {
+      font-family: var(--font-serif);
+      font-weight: normal;
+      letter-spacing: 0.01em;
+      color: var(--color-text-dark);
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: clamp(1.15rem, 2vw, 1.45rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--color-rule);
+      padding-bottom: 10px;
+      margin-bottom: 28px;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: var(--color-text-mid);
+      margin-bottom: 1em;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ============================================================
+       SECTIONS
+    ============================================================ */
+    .section {
+      padding: 56px 72px;
+      border-bottom: 1px solid var(--color-rule);
+    }
+
+    @media (max-width: 760px) {
+      .container { width: 96%; }
+      .section    { padding: 40px 28px; }
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      padding: 80px 72px 72px;
+      border-bottom: 1px solid var(--color-rule);
+    }
+
+    @media (max-width: 760px) {
+      .hero { padding: 48px 28px 40px; }
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--color-text-light);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      max-width: 680px;
+      margin-bottom: 20px;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: var(--color-text-mid);
+      max-width: 580px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid var(--color-accent);
+      color: var(--color-accent);
+      background: transparent;
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .btn:hover {
+      background: var(--color-accent);
+      color: #f7f4ee;
+    }
+
+    .btn-solid {
+      background: var(--color-accent);
+      color: #f7f4ee;
+    }
+
+    .btn-solid:hover {
+      background: var(--color-accent-hover);
+      border-color: var(--color-accent-hover);
+    }
+
+    /* ============================================================
+       PROFILE
+    ============================================================ */
+    .profile-text p + p {
+      margin-top: 1.1em;
+    }
+
+    /* ============================================================
+       CARDS (Méthode de recherche)
+    ============================================================ */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 860px) {
+      .cards-grid { grid-template-columns: 1fr; gap: 18px; }
+    }
+
+    .card {
+      background: rgba(248, 245, 239, 0.60);
+      border: 1px solid var(--color-rule);
+      border-radius: var(--radius);
+      padding: 28px 26px;
+    }
+
+    .card h3 {
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      border-bottom: 1px solid var(--color-rule);
+      padding-bottom: 9px;
+      margin-bottom: 12px;
+    }
+
+    .card p {
+      font-size: 0.92rem;
+      color: var(--color-text-mid);
+      margin-bottom: 0;
+      line-height: 1.65;
+    }
+
+    /* ============================================================
+       ELEGANT LIST (Pourquoi…)
+    ============================================================ */
+    .elegant-list {
+      list-style: none;
+      padding: 0;
+      columns: 2;
+      column-gap: 48px;
+    }
+
+    @media (max-width: 680px) {
+      .elegant-list { columns: 1; }
+    }
+
+    .elegant-list li {
+      font-size: 0.95rem;
+      color: var(--color-text-mid);
+      padding: 8px 0 8px 20px;
+      border-bottom: 1px solid var(--color-rule);
+      position: relative;
+      break-inside: avoid;
+    }
+
+    .elegant-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--color-text-light);
+      font-size: 0.8rem;
+    }
+
+    /* ============================================================
+       TWO COLUMNS (À qui s'adresse…)
+    ============================================================ */
+    .two-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+    }
+
+    @media (max-width: 680px) {
+      .two-cols { grid-template-columns: 1fr; gap: 28px; }
+    }
+
+    .two-cols h3 {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      border-bottom: 1px solid var(--color-rule);
+      padding-bottom: 9px;
+      margin-bottom: 14px;
+    }
+
+    .two-cols ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .two-cols ul li {
+      font-size: 0.92rem;
+      color: var(--color-text-mid);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--color-rule);
+    }
+
+    /* ============================================================
+       CONTACT SECTION
+    ============================================================ */
+    .section-contact {
+      background: var(--color-contact-bg);
+      padding: 56px 72px;
+      border-bottom: none;
+    }
+
+    @media (max-width: 760px) {
+      .section-contact { padding: 40px 28px; }
+    }
+
+    .contact-body {
+      display: flex;
+      align-items: flex-start;
+      gap: 64px;
+      flex-wrap: wrap;
+    }
+
+    .contact-text {
+      flex: 1 1 260px;
+    }
+
+    .contact-info {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .contact-item {
+      font-size: 0.92rem;
+      color: var(--color-text-mid);
+    }
+
+    .contact-item strong {
+      color: var(--color-text-dark);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .contact-item a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+
+    .contact-item a:hover {
+      text-decoration: underline;
+    }
+
+    .contact-cta {
+      margin-top: 22px;
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .site-footer {
+      border-top: 1px solid var(--color-rule);
+      padding: 20px 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: rgba(248, 244, 238, 0.55);
+    }
+
+    @media (max-width: 760px) {
+      .site-footer {
+        padding: 20px 28px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+    }
+
+    .footer-copy {
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+      letter-spacing: 0.01em;
+    }
+
+    .footer-attribution {
+      font-size: 0.72rem;
+      color: var(--color-text-light);
+    }
+
+    .footer-attribution a {
+      color: var(--color-text-light);
+      text-decoration: underline;
+    }
+
+    .footer-attribution a:hover {
+      color: var(--color-accent);
+    }
+
+    /* ============================================================
+       BOTTOM SPACER (so footer doesn't hug viewport edge)
+    ============================================================ */
+    .page-wrapper {
+      padding-bottom: 60px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+  <main class="container" role="main">
+
+    <!-- ======================================================
+         HERO
+    ====================================================== -->
+    <header class="hero">
+      <p class="hero-eyebrow">Antoine Zak — Historien de l'art</p>
+      <h1>Recherche de provenance<br>et identification d'objets&nbsp;d'art</h1>
+      <p class="hero-subtitle">
+        Accompagnement des particuliers et des professionnels dans
+        l'identification, l'étude et la reconstitution de l'historique
+        des œuvres et objets d'art.
+      </p>
+      <a href="#contact" class="btn" aria-label="Accéder au formulaire de contact">Demander une étude</a>
+    </header>
+
+    <!-- ======================================================
+         PROFIL ET EXPÉRIENCE
+    ====================================================== -->
+    <section class="section" id="profil" aria-labelledby="titre-profil">
+      <h2 id="titre-profil">Profil et expérience</h2>
+      <div class="profile-text">
+        <p>
+          Après une licence en histoire de l'art et archéologie ainsi que deux masters en recherche
+          en histoire de l'art et en patrimoine et musée réalisés à l'Université de Lille, je me suis
+          spécialisé dans l'étude des œuvres et des collections patrimoniales.
+        </p>
+        <p>
+          Mes expériences au sein du Musée des Beaux-Arts d'Arras et du Musée Henri Matisse m'ont
+          permis de développer une expertise en recherche documentaire, gestion des collections,
+          régie des œuvres et conservation du patrimoine.
+        </p>
+        <p>
+          Je possède aujourd'hui un vif intérêt pour la recherche de provenance. Retracer l'historique
+          d'un objet d'art est devenu un enjeu majeur pour les musées, les collectionneurs et les
+          particuliers souhaitant mieux comprendre l'origine et le parcours de leurs biens.
+        </p>
+        <p>
+          Grâce à mon expérience universitaire et professionnelle, je suis en mesure de mener des
+          recherches approfondies afin de reconstituer l'histoire de votre objet.
+        </p>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         MÉTHODE DE RECHERCHE
+    ====================================================== -->
+    <section class="section" id="methode" aria-labelledby="titre-methode">
+      <h2 id="titre-methode">Comment se déroule la recherche&nbsp;?</h2>
+      <div class="cards-grid">
+
+        <article class="card">
+          <h3>Recherche documentaire</h3>
+          <p>
+            Consultation de bibliothèques spécialisées, catalogues,
+            publications scientifiques et ressources patrimoniales.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Recherche en archives</h3>
+          <p>
+            Analyse d'archives publiques et privées afin de retrouver
+            les traces historiques d'un objet ou de ses propriétaires.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Ressources professionnelles</h3>
+          <p>
+            Accès à des outils, bases de données et ressources utilisés
+            dans le secteur patrimonial et muséal.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ======================================================
+         POURQUOI CONNAÎTRE L'HISTORIQUE
+    ====================================================== -->
+    <section class="section" id="pourquoi" aria-labelledby="titre-pourquoi">
+      <h2 id="titre-pourquoi">Pourquoi connaître l'historique d'un objet&nbsp;?</h2>
+      <ul class="elegant-list" role="list">
+        <li>Mieux comprendre son origine.</li>
+        <li>Reconstituer son parcours historique.</li>
+        <li>Identifier les propriétaires successifs.</li>
+        <li>Documenter une collection.</li>
+        <li>Préparer une expertise.</li>
+        <li>Renforcer la crédibilité d'une vente.</li>
+        <li>Déterminer ou valoriser sa valeur patrimoniale et financière.</li>
+      </ul>
+    </section>
+
+    <!-- ======================================================
+         À QUI S'ADRESSE CE SERVICE
+    ====================================================== -->
+    <section class="section" id="public" aria-labelledby="titre-public">
+      <h2 id="titre-public">À qui s'adresse ce service&nbsp;?</h2>
+      <div class="two-cols">
+
+        <div>
+          <h3>Professionnels</h3>
+          <ul role="list">
+            <li>Musées</li>
+            <li>Galeries</li>
+            <li>Antiquaires</li>
+            <li>Commissaires-priseurs</li>
+            <li>Experts</li>
+            <li>Collectivités</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>Particuliers</h3>
+          <ul role="list">
+            <li>Collectionneurs</li>
+            <li>Héritiers</li>
+            <li>Propriétaires d'objets anciens</li>
+            <li>Passionnés d'histoire et de patrimoine</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================
+         CONTACT
+    ====================================================== -->
+    <section class="section section-contact" id="contact" aria-labelledby="titre-contact">
+      <h2 id="titre-contact">Contact</h2>
+      <div class="contact-body">
+
+        <div class="contact-text">
+          <p>
+            Vous souhaitez obtenir des informations ou faire étudier un objet&nbsp;?
+            N'hésitez pas à prendre contact.
+          </p>
+          <div class="contact-cta">
+            <a href="mailto:zak.antoine@wanadoo.fr" class="btn btn-solid">
+              Contacter par e-mail
+            </a>
+          </div>
+        </div>
+
+        <address class="contact-info" style="font-style: normal;">
+          <p class="contact-item">
+            <strong>Téléphone</strong>
+            <a href="tel:0671119821">06 71 11 98 21</a>
+          </p>
+          <p class="contact-item">
+            <strong>Mail</strong>
+            <a href="mailto:zak.antoine@wanadoo.fr">zak.antoine@wanadoo.fr</a>
+          </p>
+        </address>
+
+      </div>
+    </section>
+
+    <!-- ======================================================
+         FOOTER
+    ====================================================== -->
+    <footer class="site-footer" role="contentinfo">
+      <span class="footer-copy">
+        &copy; Recherche de provenance et identification d'objets d'art
+      </span>
+      <span class="footer-attribution">
+        Image&nbsp;: <a href="https://www.magnific.com" target="_blank" rel="noopener noreferrer">designed by wirestock — Magnific.com</a>
+      </span>
+    </footer>
+
+  </main>
+</div>
+
+</body>
+</html>
